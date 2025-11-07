@@ -1,0 +1,69 @@
+{
+    "name": "qms-engine service",
+    "serviceName": "qms-engine",
+    "env": "dev",
+    "host": "0.0.0.0",
+    "port": 8085,
+    "ownerInfo": {
+      "name": "regiewby",
+      "email": "regiewby@gmail.com",
+      "url": "www.github.com/regiewby"
+    },
+    "data": {
+      "mysql": {
+        "master": {
+          "dsn": "root:@tcp(localhost:3306)/qms_engine?parseTime=true&loc=UTC",
+          "maxIdle": 2,
+          "maxOpen": 10,
+          "connMaxLifetime": "1800s"
+        },
+        "slave": {
+          "dsn": "root:@tcp(localhost:3306)/qms_engine?parseTime=true&loc=UTC",
+          "maxIdle": 2,
+          "maxOpen": 10,
+          "connMaxLifetime": "1800s"
+        },
+        "masterCircuitBreaker": {
+          "timeoutInMs": 1000,
+          "maxConcurrentReq": 100,
+          "volumePercentThreshold": 50
+        },
+        "slaveCircuitBreaker": {
+          "timeoutInMs": 1000,
+          "maxConcurrentReq": 100,
+          "volumePercentThreshold": 50
+        }
+      }
+    },
+    "redisConfig": {
+      "addr": "localhost:6379",
+      "idleTimeoutInSec": 60,
+      "poolSize": 500,
+      "readOnlyFromSlaves": false,
+      "readTimeoutInSec": 1,
+      "writeTimeoutInSec": 1,
+      "tlsEnabled": false
+    },
+    "statsd": {
+      "host": "localhost",
+      "port": 8125
+    },
+    "trace": {
+      "host": "localhost",
+      "port": 8126,
+      "disable": true
+    },
+    "logger": {
+      "workerCount": 10,
+      "bufferSize": 10000,
+      "logLevel": 2,
+      "stacktraceLevel": 4,
+      "logFormat": "cglsdebug"
+    },
+    "kafka": {
+      "bootstrap.servers": "localhost:9092",
+      "group.id": "qms-engine",
+      "auto.offset.reset": "earliest",
+      "producer.enabled": true
+    }
+  }
