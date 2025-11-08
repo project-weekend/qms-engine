@@ -1,18 +1,31 @@
 package server
 
 import (
-	"github.com/sirupsen/logrus"
+	"fmt"
+	"log"
 
-	"github.com/project-weekend/qms-engine/server/config"
+	"github.com/project-weekend/qms-engine/internal/config"
 )
 
 func Serve() {
-	// Load configuration from service-config.json
 	appConfig := config.LoadConfig()
-	logger := logrus.New()
+	logger := config.NewLogger(appConfig)
 	db := config.NewDatabase(appConfig, logger)
-	ginEngine := config.NewGinEngine(appConfig, logger)
-	if err := config.StartGinServer(ginEngine, appConfig, logger); err != nil {
-		logger.Fatalf("Failed to start HTTP server: %v", err)
+	validator := config.NewValidator()
+	appEngine := config.NewGinEngine(appConfig, logger)
+
+	config.Bootstrap(&config.AppBootstrap{
+		Config:    appConfig,
+		Logger:    logger,
+		DB:        db,
+		Validate:  validator,
+		AppEngine: appEngine,
+	})
+
+	addr := fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)
+	logger.Infof("Starting HTTP server on %s", addr)
+
+	if err := appEngine.Run(addr); err != nil {
+		log.Fatal(fmt.Errorf("failed to start http server: %w", err))
 	}
 }

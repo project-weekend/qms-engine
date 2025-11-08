@@ -9,30 +9,16 @@
       "email": "regiewby@gmail.com",
       "url": "www.github.com/regiewby"
     },
-    "data": {
-      "mysql": {
-        "master": {
-          "dsn": "root:@tcp(localhost:3306)/qms_engine?parseTime=true&loc=UTC",
-          "maxIdle": 2,
-          "maxOpen": 10,
-          "connMaxLifetime": "1800s"
-        },
-        "slave": {
-          "dsn": "root:@tcp(localhost:3306)/qms_engine?parseTime=true&loc=UTC",
-          "maxIdle": 2,
-          "maxOpen": 10,
-          "connMaxLifetime": "1800s"
-        },
-        "masterCircuitBreaker": {
-          "timeoutInMs": 1000,
-          "maxConcurrentReq": 100,
-          "volumePercentThreshold": 50
-        },
-        "slaveCircuitBreaker": {
-          "timeoutInMs": 1000,
-          "maxConcurrentReq": 100,
-          "volumePercentThreshold": 50
-        }
+    "database": {
+      "username": "root",
+      "password": "",
+      "host": "localhost",
+      "port": 3306,
+      "name": "qms_engine",
+      "pool": {
+        "idle": 10,
+        "max": 100,
+        "lifetime": 300
       }
     },
     "redisConfig": {

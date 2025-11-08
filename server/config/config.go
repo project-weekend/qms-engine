@@ -1,6 +1,6 @@
 package config
 
-// Config is the main configuration structure for qms-engine service
+// Config is the main configuration structure for qms-engine usecase
 type Config struct {
 	Name        string      `json:"name"`
 	ServiceName string      `json:"serviceName"`
@@ -8,7 +8,7 @@ type Config struct {
 	Host        string      `json:"host"`
 	Port        int         `json:"port"`
 	OwnerInfo   OwnerInfo   `json:"ownerInfo"`
-	Data        Data        `json:"data"`
+	Database    Database    `json:"database"`
 	RedisConfig RedisConfig `json:"redisConfig"`
 	Statsd      Statsd      `json:"statsd"`
 	Trace       Trace       `json:"trace"`
@@ -16,32 +16,24 @@ type Config struct {
 	Kafka       KafkaConfig `json:"kafka"`
 }
 
-// OwnerInfo contains information about the service owner
+// OwnerInfo contains information about the usecase owner
 type OwnerInfo struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 	URL   string `json:"url"`
 }
 
-// Data contains all data source configurations
-type Data struct {
-	MySQL MySQL `json:"mysql"`
-}
-
-// MySQL contains MySQL database configurations
-type MySQL struct {
-	Master               DBConfig       `json:"master"`
-	Slave                DBConfig       `json:"slave"`
-	MasterCircuitBreaker CircuitBreaker `json:"masterCircuitBreaker"`
-	SlaveCircuitBreaker  CircuitBreaker `json:"slaveCircuitBreaker"`
-}
-
-// DBConfig contains database connection configuration
-type DBConfig struct {
-	DSN             string `json:"dsn"`
-	MaxIdle         int    `json:"maxIdle"`
-	MaxOpen         int    `json:"maxOpen"`
-	ConnMaxLifetime string `json:"connMaxLifetime"`
+type Database struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	Name     string `json:"name"`
+	Pool     struct {
+		Idle     int `json:"idle"`
+		Max      int `json:"max"`
+		Lifetime int `json:"lifetime"`
+	} `json:"pool"`
 }
 
 // CircuitBreaker contains circuit breaker configuration
@@ -90,16 +82,4 @@ type KafkaConfig struct {
 	GroupID          string `json:"group.id"`
 	AutoOffsetReset  string `json:"auto.offset.reset"`
 	ProducerEnabled  bool   `json:"producer.enabled"`
-}
-
-// LoadConfig loads configuration from viper and unmarshals into Config struct
-func LoadConfig() *Config {
-	v := NewViper()
-
-	var config Config
-	if err := v.Unmarshal(&config); err != nil {
-		panic(err)
-	}
-
-	return &config
 }
