@@ -1,1 +1,9 @@
-vendor
+.idea/
+.vscode
+vendor/
+local_debug_config.json
+**/.DS_Store
+**/out/**
+tmp/
+*.out.tmp
+cover.out*
