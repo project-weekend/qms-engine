@@ -18,14 +18,12 @@ const (
 	ErrCode_Unregistered        ErrorCode = "UNREGISTERED_ERRCODE"
 )
 
-var (
-	ErrorMappings = map[ErrorCode]ErrorMapping{
-		ErrCode_BadRequest:          {HTTPCode: http.StatusBadRequest, Message: "request has invalid parameter(s) or header(s)."},
-		ErrCode_Forbidden:           {HTTPCode: http.StatusForbidden, Message: "the operation is forbidden."},
-		ErrCode_ResourceNotFound:    {HTTPCode: http.StatusNotFound, Message: "resource not found."},
-		ErrCode_InternalServerError: {HTTPCode: http.StatusInternalServerError, Message: "There is a problem on our end. Please try again later."},
-	}
-)
+var ErrorMappings = map[ErrorCode]ErrorMapping{
+	ErrCode_BadRequest:          {HTTPCode: http.StatusBadRequest, Message: "request has invalid parameter(s) or header(s)."},
+	ErrCode_Forbidden:           {HTTPCode: http.StatusForbidden, Message: "the operation is forbidden."},
+	ErrCode_ResourceNotFound:    {HTTPCode: http.StatusNotFound, Message: "resource not found."},
+	ErrCode_InternalServerError: {HTTPCode: http.StatusInternalServerError, Message: "There is a problem on our end. Please try again later."},
+}
 
 type ErrorMapping struct {
 	HTTPCode int
@@ -53,13 +51,13 @@ type ErrorDetail struct {
 	Path      string `json:"path,omitempty"`
 }
 
-func NewServiceError(errCode ErrorCode, errDetails []ErrorDetail) ServiceError {
+func NewServiceError(errCode ErrorCode, errDetails []ErrorDetail) *ServiceError {
 	mapping, ok := ErrorMappings[errCode]
 	if !ok {
 		mapping = ErrorMappings[ErrCode_Unregistered]
 	}
 
-	return ServiceError{
+	return &ServiceError{
 		HTTPStatus: mapping.HTTPCode,
 		Code:       string(errCode),
 		Message:    mapping.Message,
@@ -82,4 +80,12 @@ func ParseValidationErrors(err error) []ErrorDetail {
 	}
 
 	return errorDetails
+}
+
+func AsServiceError(err error) *ServiceError {
+	var serviceErr *ServiceError
+	if errors.As(err, &serviceErr) {
+		return serviceErr
+	}
+	return nil
 }

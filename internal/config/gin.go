@@ -1,17 +1,17 @@
 package config
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/project-weekend/qms-engine/server/config"
-	"github.com/sirupsen/logrus"
 )
 
 // NewGinEngine initializes and configures a new Gin engine with middleware
-func NewGinEngine(config *config.Config, log *logrus.Logger) *gin.Engine {
+func NewGinEngine(config *config.Config, log *slog.Logger) *gin.Engine {
 	// Set Gin mode based on environment
 	if config.Env == "production" || config.Env == "prod" {
 		gin.SetMode(gin.ReleaseMode)
@@ -46,8 +46,8 @@ func NewGinEngine(config *config.Config, log *logrus.Logger) *gin.Engine {
 	return engine
 }
 
-// LoggingMiddleware creates a custom logging middleware using logrus
-func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
+// LoggingMiddleware creates a custom logging middleware using slog
+func LoggingMiddleware(log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
 
@@ -61,30 +61,30 @@ func LoggingMiddleware(log *logrus.Logger) gin.HandlerFunc {
 		statusCode := c.Writer.Status()
 
 		// Log request details
-		log.WithFields(logrus.Fields{
-			"status":     statusCode,
-			"method":     c.Request.Method,
-			"path":       c.Request.URL.Path,
-			"query":      c.Request.URL.RawQuery,
-			"ip":         c.ClientIP(),
-			"user_agent": c.Request.UserAgent(),
-			"latency":    latency.Milliseconds(),
-			"error":      c.Errors.ByType(gin.ErrorTypePrivate).String(),
-		}).Info("HTTP request")
+		log.Info("HTTP request",
+			"status", statusCode,
+			"method", c.Request.Method,
+			"path", c.Request.URL.Path,
+			"query", c.Request.URL.RawQuery,
+			"ip", c.ClientIP(),
+			"user_agent", c.Request.UserAgent(),
+			"latency", latency.Milliseconds(),
+			"error", c.Errors.ByType(gin.ErrorTypePrivate).String(),
+		)
 	}
 }
 
-// RecoveryMiddleware creates a custom recovery middleware using logrus
-func RecoveryMiddleware(log *logrus.Logger) gin.HandlerFunc {
+// RecoveryMiddleware creates a custom recovery middleware using slog
+func RecoveryMiddleware(log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.WithFields(logrus.Fields{
-					"error":  err,
-					"method": c.Request.Method,
-					"path":   c.Request.URL.Path,
-					"ip":     c.ClientIP(),
-				}).Error("Panic recovered")
+				log.Error("Panic recovered",
+					"error", err,
+					"method", c.Request.Method,
+					"path", c.Request.URL.Path,
+					"ip", c.ClientIP(),
+				)
 
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 					"error": "Internal server error",

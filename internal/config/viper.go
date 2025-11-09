@@ -20,7 +20,6 @@ func NewViper() *viper.Viper {
 	config.AddConfigPath(filepath.Join(".", "config_files")) // Alternative format
 
 	err := config.ReadInConfig()
-
 	if err != nil {
 		panic(fmt.Errorf("fatal error reading config file: %w", err))
 	}

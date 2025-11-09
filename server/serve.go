@@ -23,7 +23,7 @@ func Serve() {
 	})
 
 	addr := fmt.Sprintf("%s:%d", appConfig.Host, appConfig.Port)
-	logger.Infof("Starting HTTP server on %s", addr)
+	logger.Info(fmt.Sprintf("Starting HTTP server on %s", addr))
 
 	if err := appEngine.Run(addr); err != nil {
 		log.Fatal(fmt.Errorf("failed to start http server: %w", err))

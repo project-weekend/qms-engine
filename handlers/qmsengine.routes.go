@@ -8,5 +8,5 @@ type RouteConfig struct {
 }
 
 func (r *RouteConfig) RegisterRoutes() {
-	r.AppEngine.POST("/v1/project", r.CreateProject)
+	r.AppEngine.POST("/api/v1/project", r.CreateProject)
 }

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"log/slog"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/jmoiron/sqlx"
@@ -8,12 +10,11 @@ import (
 	"github.com/project-weekend/qms-engine/internal/repository/mysql"
 	"github.com/project-weekend/qms-engine/internal/service/project"
 	"github.com/project-weekend/qms-engine/server/config"
-	"github.com/sirupsen/logrus"
 )
 
 type AppBootstrap struct {
 	Config    *config.Config
-	Logger    *logrus.Logger
+	Logger    *slog.Logger
 	DB        *sqlx.DB
 	Validate  *validator.Validate
 	AppEngine *gin.Engine

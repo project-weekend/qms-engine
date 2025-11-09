@@ -1,21 +1,19 @@
 package mysql
 
 import (
-	"database/sql"
-	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/project-weekend/qms-engine/internal/entity"
-	"github.com/sirupsen/logrus"
 )
 
 type ProjectRepository struct {
-	Logger *logrus.Logger
+	Logger *slog.Logger
 }
 
-func NewProjectRepository(logger *logrus.Logger) *ProjectRepository {
+func NewProjectRepository(logger *slog.Logger) *ProjectRepository {
 	return &ProjectRepository{
 		Logger: logger,
 	}
@@ -63,11 +61,7 @@ func (p *ProjectRepository) GetByName(tx *sqlx.Tx, name string) (*entity.Project
 	var project entity.Project
 	err := tx.Get(&project, query, name)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			p.Logger.Warn("project not found")
-			return nil, fmt.Errorf("project with name %s not found", name)
-		}
-		return nil, fmt.Errorf("failed to get project: %w", err)
+		return nil, err
 	}
 
 	return &project, nil

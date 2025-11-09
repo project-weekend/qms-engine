@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/project-weekend/qms-engine/internal/common"
@@ -22,16 +23,16 @@ func (p *ProjectServiceImpl) CreateProject(ctx context.Context, request *model.C
 	existingProject, err := p.ProjectRepository.GetByName(tx, request.Name)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			p.Logger.WithContext(ctx).Error(logTag, "CreateProject GetByName error: ", err)
+			p.Logger.ErrorContext(ctx, "CreateProject GetByName error", "tag", logTag, "error", err)
 			return nil, common.NewServiceError(common.ErrCode_InternalServerError, nil)
 		}
 	} else if existingProject != nil {
-		p.Logger.WithContext(ctx).Warn(logTag, "CreateProject: project name already exists: ", request.Name)
+		p.Logger.WarnContext(ctx, "CreateProject: project name already exists", "tag", logTag, "name", request.Name)
 		return nil, common.NewServiceError(common.ErrCode_Forbidden, nil)
 	}
 
 	project := &entity.Project{
-		Name:        request.Name,
+		Name:        strings.ToLower(request.Name),
 		Description: request.Description,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
@@ -40,13 +41,13 @@ func (p *ProjectServiceImpl) CreateProject(ctx context.Context, request *model.C
 
 	savedProject, err := p.ProjectRepository.Save(tx, project)
 	if err != nil {
-		p.Logger.WithContext(ctx).Error(logTag, "Save project error: ", err)
+		p.Logger.ErrorContext(ctx, "Save project error", "tag", logTag, "error", err)
 		return nil, common.NewServiceError(common.ErrCode_InternalServerError, nil)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		p.Logger.WithContext(ctx).Error(logTag, "Commit project error: ", err)
+		p.Logger.ErrorContext(ctx, "Commit project error", "tag", logTag, "error", err)
 		return nil, common.NewServiceError(common.ErrCode_InternalServerError, nil)
 	}
 
